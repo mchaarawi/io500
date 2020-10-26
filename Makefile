@@ -1,10 +1,13 @@
 CC = mpicc
 CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Werror=maybe-uninitialized -Warray-bounds
+CFLAGS += -I/home/mschaara/install/daos/include -I/home/mschaara/install/mpifileutils/include
 
 IORCFLAGS = $(shell grep CFLAGS ./build/ior/Makefile | cut -d "=" -f 2-)
 CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
 IORLIBS = $(shell grep LIBS ./build/ior/Makefile | cut -d "=" -f 2-)
 LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS) # -lgpfs # may need some additional flags as provided to IOR
+LDFLAGS += -L/home/mschaara/install/daos/lib64 -ldaos -ldaos_common -ldfs -lgurt -luuid
+LDFLAGS += -L/home/mschaara/install/mpifileutils/lib64 -lmfu_dfind -lmfu
 
 VERSION_GIT=$(shell git describe --always --abbrev=12)
 VERSION_TREE=$(shell git diff src | wc -l | sed -e 's/   *//g' -e 's/^0//' | sed "s/\([0-9]\)/-\1/")

@@ -59,14 +59,16 @@ function get_ior {
 
 function get_pfind {
   echo "Preparing parallel find"
-  git_co https://github.com/VI4IO/pfind.git pfind $PFIND_HASH
+  pushd $BUILD
+  git clone https://github.com/mchaarawi/pfind/ -b mfu_integration
+  popd
 }
 
 ###### BUILD FUNCTIONS
 function build_ior {
   pushd $BUILD/ior
   ./bootstrap
-  ./configure --prefix=$INSTALL_DIR
+  ./configure --prefix=$INSTALL_DIR --with-cart=/home/mschaara/install/daos --with-daos=/home/mschaara/install/daos
   cd src
   $MAKE clean
   $MAKE install
