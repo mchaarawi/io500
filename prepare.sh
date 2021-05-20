@@ -7,8 +7,8 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=bd76b45ef9db
-PFIND_HASH=9d77056adce6
+IOR_HASH=0410a38e985e0862a9fd9abec017abffc4c5fc43
+PFIND_HASH=mfu_integration
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
@@ -19,6 +19,7 @@ function main {
   # listed here, easier to spot and run if something fails
   setup
 
+  get_schema_tools
   get_ior
   get_pfind
 
@@ -45,7 +46,6 @@ function git_co {
   pushd $BUILD
   [ -d "$dir" ] || git clone $repo $dir
   cd $dir
-  # turning off the hash thing for now because too many changes happening too quickly
   git fetch
   git checkout $tag
   popd
@@ -59,16 +59,21 @@ function get_ior {
 
 function get_pfind {
   echo "Preparing parallel find"
-  pushd $BUILD
-  git clone https://github.com/mchaarawi/pfind/ -b mfu_integration
+  git_co https://github.com/mchaarawi/pfind pfind $PFIND_HASH
   popd
+}
+
+function get_schema_tools {
+  echo "Downloading supplementary schema tools"
+  git_co https://github.com/VI4IO/cdcl-schema-tools.git cdcl-schema-tools
+  [ -d "$dir" ] || ln -sf $PWD/build/cdcl-schema-tools  schema-tools
 }
 
 ###### BUILD FUNCTIONS
 function build_ior {
   pushd $BUILD/ior
   ./bootstrap
-  ./configure --prefix=$INSTALL_DIR --with-cart=/home/mschaara/install/daos --with-daos=/home/mschaara/install/daos
+  ./configure --prefix=$INSTALL_DIR --with-daos=/home/mschaara/install/daos
   cd src
   $MAKE clean
   $MAKE install
